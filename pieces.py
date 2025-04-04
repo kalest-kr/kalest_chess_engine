@@ -1,5 +1,3 @@
-from tensorflow import keras
-
 files = ['a','b','c','d','e','f','g','h']  # 가로(col)
 ranks = ['8','7','6','5','4','3','2','1']  # 세로(row)
 
