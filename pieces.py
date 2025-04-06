@@ -38,8 +38,6 @@ def turn_change(x):
         turn_count += 1
         return turn, turn_count
 
-
-
 class piece:
     def __init__(self, role, color, pos):
         self.role = role #기물의 역할
@@ -50,43 +48,57 @@ class piece:
         self.two_move_turn = None #앙파상 측정용. 움직인 턴을 기록
         self.rook_move_check = False #캐슬링에서 룩의 움직임을 판별
         self.king_move_check = False #캐슬링에서 킹의 움직임 판별
+        self.absolute_pin = False
 
 def move(square):
     global turn
     global turn_count
     if turn == "white": #흰색 기물의 실제 움직임 발동
+        if square[0] == "O": #캐슬링 판정
+            if square == "O-O": #숏캐슬
+                if white_short_castle(white_king, white_rook2): #캐슬 가능 여부 파악
+                    white_king.king_move_check = True #앞으로는 발동 못하도록 킹 값을 변경
+                    white_king.pos = 'g1'
+                    white_rook2.pos = 'f1'
+            elif square == "O-O-O":
+                if white_long_castle(white_king, white_rook1):
+                    white_king.king_move_check = True
+                    white_king.pos = 'c1'
+                    white_rook2.pos = 'd1'
         if square[0] == "N":
-            if square == night_move(white_night1):
-                white_night1.pos = square
-                turn = turn_change(turn)
-            elif square == night_move(white_night2):
-                white_night2.pos = square
-                turn = turn_change(turn)
+            for i in white_piece_list: # 프로모션 기물을 위한 변경
+                if i.role == "night":
+                    if square == night_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
         elif square[0] == "B":
-            if square == bishop_move(white_bishop1):
-                white_bishop1.pos = square
-                turn = turn_change(turn)
-            elif square == bishop_move(white_bishop2):
-                white_bishop2.pos = square
+            for i in white_piece_list:
+                if i.role == "bishop":
+                    if square == bishop_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
                 turn = turn_change(turn)
         elif square[0] == "R":
-            if square == rook_move(white_rook1):
-                white_rook1.pos = square
-                white_rook1.rook_move_check = True
-                turn = turn_change(turn)
-            elif square == rook_move(white_rook2):
-                white_rook2.pos = square
-                white_rook2.rook_move_check = True
-                turn = turn_change(turn)
+            for i in white_piece_list:
+                if i.role == "rook":
+                    if square == rook_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
+                        if i == white_rook1:
+                            i.rook_move_check = True
+                        if i == white_rook2:
+                            i.rook_move_check = True
         elif square[0] == "Q":
-            if square == queen_move(white_queen):
-                white_queen.pos = square
-                turn = turn_change(turn)
+            for i in white_piece_list:
+                if i.role == "queen":
+                    if square == queen_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
         elif square[0] == "K":
             if square == king_move(white_king):
                 white_king.pos = square
                 turn = turn_change(turn)
-                white_king.king_move_check = True
+
         else:
             if square == white_pawn_move(white_pawn1)[0]:
                 white_pawn1.pos = square
@@ -138,31 +150,46 @@ def move(square):
                     white_pawn8.two_move_turn = turn_count
 
     elif turn == "black":
+        if square[0] == "O":
+            if square == "O-O":
+                if black_short_castle(black_king, black_rook2):
+                    black_king.king_move_check = True
+                    black_king.pos = 'g8'
+                    black_rook2.pos = 'f8'
+            elif square == "O-O-O":
+                if black_long_castle(black_king, black_rook1):
+                    black_king.king_move_check = True
+                    black_king.pos = 'c8'
+                    black_rook2.pos = 'd8'
         if square[0] == "N":
-            if square == night_move(black_night1):
-                black_night1.pos = square
-                turn, turn_count = turn_change(turn)
-            elif square == night_move(black_night2):
-                black_night2.pos = square
-                turn, turn_count = turn_change(turn)
+            for i in black_piece_list:  # 프로모션 기물을 위한 변경
+                if i.role == "night":
+                    if square == night_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
         elif square[0] == "B":
-            if square == bishop_move(black_bishop1):
-                black_bishop1.pos = square
-                turn, turn_count = turn_change(turn)
-            elif square == bishop_move(black_bishop2):
-                black_bishop2.pos = square
-                turn, turn_count = turn_change(turn)
+            for i in black_piece_list:
+                if i.role == "bishop":
+                    if square == bishop_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
+                turn = turn_change(turn)
         elif square[0] == "R":
-            if square == rook_move(black_rook1):
-                black_rook1.pos = square
-                turn, turn_count = turn_change(turn)
-            elif square == rook_move(black_rook2):
-                black_rook2.pos = square
-                turn, turn_count = turn_change(turn)
+            for i in black_piece_list:
+                if i.role == "rook":
+                    if square == rook_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
+                        if i == black_rook1:
+                            i.rook_move_check = True
+                        if i == black_rook2:
+                            i.rook_move_check = True
         elif square[0] == "Q":
-            if square == queen_move(black_queen):
-                black_rook1.pos = square
-                turn, turn_count = turn_change(turn)
+            for i in black_piece_list:
+                if i.role == "queen":
+                    if square == queen_move(i):
+                        i.pos = square
+                        turn = turn_change(turn)
         elif square[0] == "K":
             if square == king_move(black_king):
                 black_king.pos = square
@@ -518,7 +545,7 @@ def queen_move(piece):
 
 def king_move(piece):
     row, col = square_to_rc(piece.pos)
-    possible_moves = []  #가능한 움직임을 전부 측정하고 이동이 실제로 가능한지 판단
+    possible_moves = []  #가능한 움직임을 전부 측정하고 이동이 실제로 가능한지는 이후에 판단
     possible_moves.append(rc_to_square(row + 1, col))
     possible_moves.append(rc_to_square(row + 1, col + 1))
     possible_moves.append(rc_to_square(row + 1, col - 1))
@@ -527,17 +554,6 @@ def king_move(piece):
     possible_moves.append(rc_to_square(row - 1, col))
     possible_moves.append(rc_to_square(row - 1, col + 1))
     possible_moves.append(rc_to_square(row - 1, col - 1))
-    if piece.color == "white":
-        if white_short_castle(white_king, white_rook2):
-            possible_moves.append('g1')
-        if white_long_castle(white_king, white_rook1):
-            possible_moves.append('c1')
-    if piece.color == "black":
-        if black_short_castle(black_king, black_rook2):
-            possible_moves.append('g8')
-        elif black_long_castle(black_king, black_rook1):
-            possible_moves.append('c8')
-
 
     opposite_color_pieces = [] #공격 가능한 기물의 리스트
     for i in pieces_list: #킹을 공격할 기물들을 선별
@@ -571,11 +587,26 @@ def king_move(piece):
             queen_attack_list = queen_move(i)
             for p in queen_attack_list:
                 possible_moves.remove(p)
+        if i.role == "king":  #킹끼리는 공격 경로에 들어갈 수 없음. 그러나 재귀함수는 이용이 어려움으로 따로 계산
+            temp_row, temp_col = square_to_rc(i.pos)
+            temp_possible_moves = []
+            temp_possible_moves.append(rc_to_square(temp_row + 1, temp_col))
+            temp_possible_moves.append(rc_to_square(temp_row + 1, temp_col + 1))
+            temp_possible_moves.append(rc_to_square(temp_row + 1, temp_col - 1))
+            temp_possible_moves.append(rc_to_square(temp_row, temp_col + 1))
+            temp_possible_moves.append(rc_to_square(temp_row, temp_col - 1))
+            temp_possible_moves.append(rc_to_square(temp_row - 1, temp_col))
+            temp_possible_moves.append(rc_to_square(temp_row - 1, temp_col + 1))
+            temp_possible_moves.append(rc_to_square(temp_row - 1, temp_col - 1))
+            for p in temp_possible_moves:
+                possible_moves.remove(p)
+
 
 def white_short_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
         if piece.king_move_check == False and piece2.rook_move_check == False\
-                and square_check('f1') and square_check('g1'):
+                and square_check('f1') and square_check('g1'): #기본 조건인 킹 움직임과 룩 움직임 그리고 중간 칸이 비었는지 여부 확인
+            # 공격 하는 기물이 있는지 파악. 칸이 공격당하는 중이면 거짓을 반환
             for i in pieces_list:
                 if i.color == "black":
                     if i.role == "pawn":
@@ -680,7 +711,8 @@ def black_short_castle(piece, piece2):
 def black_long_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
         if piece.king_move_check == False and piece2.rook_move_check == False\
-                and square_check('c8') and square_check('d8'):
+                and square_check('c8') and square_check('d8'): #기본 조건인 킹 움직임과 룩 움직임 그리고 중간 칸이 비었는지 여부 확인
+            #공격 하는 기물이 있는지 파악. 칸이 공격당하는 중이면 거짓을 반환
             for i in pieces_list:
                 if i.color == "black":
                     if i.role == "pawn":
@@ -765,6 +797,17 @@ black_rook2 = piece("rook", "black", "h8")
 
 black_king = piece("king", "black", "e8")
 black_queen = piece("queen", "black", "d8")
+
+white_piece_list = [
+    white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8, white_night1,
+    white_night2, white_rook1, white_rook2, white_bishop1, white_bishop2, white_queen, white_king
+]
+
+black_piece_list = [
+    black_rook1, black_rook2,
+    black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_night1,
+    black_night2, black_bishop1, black_bishop2, black_queen, black_king
+]
 
 pieces_list = [
     white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8, white_night1,
