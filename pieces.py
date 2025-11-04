@@ -744,6 +744,60 @@ def black_long_castle(piece, piece2):
         else:
             return False
 
+def diagnol_pin(piece):
+    row, col = square_to_rc(piece.pos)
+    positive_row = 8 - row
+    positive_col = 8 - col
+    min_val = min(positive_row, positive_col) #계산해야하는 사각형의 넓이 지정
+    temp_piece_list = []
+    for i in range(min_val):
+        temp_row = row + 1
+        temp_col = col + 1
+        temp_square = rc_to_square(temp_row, temp_col)
+        if square_check(temp_square) == False:
+            for p in pieces_list:
+                if p.pos == temp_square:
+                    temp_piece_list.append(p)
+        if len(temp_piece_list) == 2:
+            break
+    min_val = min(positive_row, col)  # 계산해야하는 사각형의 넓이 지정
+    temp_piece_list = []
+    for i in range(min_val):
+        temp_row = row + 1
+        temp_col = col - 1
+        temp_square = rc_to_square(temp_row, temp_col)
+        if square_check(temp_square) == False:
+            for p in pieces_list:
+                if p.pos == temp_square:
+                    temp_piece_list.append(p)
+        if len(temp_piece_list) == 2:
+            break
+    min_val = min(row, col)  # 계산해야하는 사각형의 넓이 지정
+    temp_piece_list = []
+    for i in range(min_val):
+        temp_row = row - 1
+        temp_col = col - 1
+        temp_square = rc_to_square(temp_row, temp_col)
+        if square_check(temp_square) == False:
+            for p in pieces_list:
+                if p.pos == temp_square:
+                    temp_piece_list.append(p)
+        if len(temp_piece_list) == 2:
+            break
+    min_val = min(row, positive_col)  # 계산해야하는 사각형의 넓이 지정
+    temp_piece_list = []
+    for i in range(min_val):
+        temp_row = row - 1
+        temp_col = col + 1
+        temp_square = rc_to_square(temp_row, temp_col)
+        if square_check(temp_square) == False:
+            for p in pieces_list:
+                if p.pos == temp_square:
+                    temp_piece_list.append(p)
+        if len(temp_piece_list) == 2:
+            break
+
+
 def square_check(square: str) -> bool:
     for p in pieces_list:
         if p.pos == square:
