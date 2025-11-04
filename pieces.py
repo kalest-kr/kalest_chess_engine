@@ -761,6 +761,10 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            piece_1.absolute_pin = True
     min_val = min(positive_row, col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -774,6 +778,10 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
+            piece_1 = temp_piece_list[0]
+            piece_2 = temp_piece_list[1]
+            if piece_1.color == piece.color and piece_2.color != piece.color:
+                piece_1.absolute_pin = True
     min_val = min(row, col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -787,6 +795,10 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
+            piece_1 = temp_piece_list[0]
+            piece_2 = temp_piece_list[1]
+            if piece_1.color == piece.color and piece_2.color != piece.color:
+                piece_1.absolute_pin = True
     min_val = min(row, positive_col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -800,6 +812,10 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
+            piece_1 = temp_piece_list[0]
+            piece_2 = temp_piece_list[1]
+            if piece_1.color == piece.color and piece_2.color != piece.color:
+                piece_1.absolute_pin = True
 
 def square_check(square: str) -> bool:
     for p in pieces_list:
