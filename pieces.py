@@ -750,22 +750,22 @@ def diagnol_pin(piece):
     positive_col = 8 - col
     min_val = min(positive_row, positive_col) #계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
-    if min_val >= 2:
+    if min_val >= 2: #두칸 이상 남았을 경우만 계산
         for i in range(min_val):
             temp_row = row + 1
             temp_col = col + 1
             temp_square = rc_to_square(temp_row, temp_col)
-            if square_check(temp_square) == False:
+            if square_check(temp_square) == False: #기물의 존재 여부 확인
                 for p in pieces_list:
                     if p.pos == temp_square:
-                        temp_piece_list.append(p)
-            if len(temp_piece_list) == 2:
+                        temp_piece_list.append(p) #기물 불러오기
+            if len(temp_piece_list) == 2: #2개 수집했을 경우 중지
                 break
         piece_1 = temp_piece_list[0]
         piece_2 = temp_piece_list[1]
-        if piece_1.color == piece.color and piece_2.color != piece.color:
-            if piece_2.role == "Queen" or piece_2.role == "bishop":
-                piece_1.absolute_pin = True
+        if piece_1.color == piece.color and piece_2.color != piece.color: # 두 번째가 공격 기물, 첫 번째가 수비 기물
+            if piece_2.role == "Queen" or piece_2.role == "bishop": #역할 확인
+                piece_1.absolute_pin = True #절대핀 활성화
     min_val = min(positive_row, col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -779,11 +779,11 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
-            piece_1 = temp_piece_list[0]
-            piece_2 = temp_piece_list[1]
-            if piece_1.color == piece.color and piece_2.color != piece.color:
-                if piece_2.role == "Queen" or piece_2.role == "bishop":
-                    piece_1.absolute_pin = True
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "bishop":
+                piece_1.absolute_pin = True
     min_val = min(row, col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -797,11 +797,11 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
-            piece_1 = temp_piece_list[0]
-            piece_2 = temp_piece_list[1]
-            if piece_1.color == piece.color and piece_2.color != piece.color:
-                if piece_2.role == "Queen" or piece_2.role == "bishop":
-                    piece_1.absolute_pin = True
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "bishop":
+                piece_1.absolute_pin = True
     min_val = min(row, positive_col)  # 계산해야하는 사각형의 넓이 지정
     temp_piece_list = []
     if min_val >= 2:
@@ -815,11 +815,80 @@ def diagnol_pin(piece):
                         temp_piece_list.append(p)
             if len(temp_piece_list) == 2:
                 break
-            piece_1 = temp_piece_list[0]
-            piece_2 = temp_piece_list[1]
-            if piece_1.color == piece.color and piece_2.color != piece.color:
-                if piece_2.role == "Queen" or piece_2.role == "bishop":
-                    piece_1.absolute_pin = True
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "bishop":
+                piece_1.absolute_pin = True
+
+def vertical_pin(piece):
+    row, col = square_to_rc(piece.pos)
+    positive_row = 8 - row
+    positive_col = 8 - col
+    temp_piece_list = []
+    if positive_row >= 2:
+        for i in range(positive_row):
+            temp_row = row + 1
+            temp_square = rc_to_square(temp_row, col)
+            if square_check(temp_square) == False:
+                for p in pieces_list:
+                    if p.pos == temp_square:
+                        temp_piece_list.append(p)
+            if len(temp_piece_list) == 2:
+                break
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "rook":
+                piece_1.absolute_pin = True
+    temp_piece_list = []
+    if col >= 2:
+        for i in range(col):
+            temp_col = col - 1
+            temp_square = rc_to_square(row, temp_col)
+            if square_check(temp_square) == False:
+                for p in pieces_list:
+                    if p.pos == temp_square:
+                        temp_piece_list.append(p)
+            if len(temp_piece_list) == 2:
+                break
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "rook":
+                piece_1.absolute_pin = True
+    temp_piece_list = []
+    if row >= 2:
+        for i in range(row):
+            temp_row = row - 1
+            temp_square = rc_to_square(temp_row, col)
+            if square_check(temp_square) == False:
+                for p in pieces_list:
+                    if p.pos == temp_square:
+                        temp_piece_list.append(p)
+                if len(temp_piece_list) == 2:
+                    break
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "rook":
+                piece_1.absolute_pin = True
+    temp_piece_list = []
+    if positive_col >= 2:
+        for i in range(positive_col):
+            temp_col = col + 1
+            temp_square = rc_to_square(row, temp_col)
+            if square_check(temp_square) == False:
+                for p in pieces_list:
+                    if p.pos == temp_square:
+                        temp_piece_list.append(p)
+            if len(temp_piece_list) == 2:
+                break
+        piece_1 = temp_piece_list[0]
+        piece_2 = temp_piece_list[1]
+        if piece_1.color == piece.color and piece_2.color != piece.color:
+            if piece_2.role == "Queen" or piece_2.role == "rook":
+                piece_1.absolute_pin = True
 
 def square_check(square: str) -> bool:
     for p in pieces_list:
