@@ -100,54 +100,16 @@ def move(square):
                 turn = turn_change(turn)
 
         else:
-            if square == white_pawn_move(white_pawn1)[0]:
-                white_pawn1.pos = square
-                promotion(white_pawn1, square)
-                if white_pawn_move(white_pawn1)[1] == True:
-                    white_pawn1.enpassant = True
-                    white_pawn1.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn2)[0]:
-                white_pawn2.pos = square
-                promotion(white_pawn2, square)
-                if white_pawn_move(white_pawn2)[1] == True:
-                    white_pawn2.enpassant = True
-                    white_pawn2.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn3)[0]:
-                white_pawn3.pos = square
-                promotion(white_pawn3, square)
-                if white_pawn_move(white_pawn3)[1] == True:
-                    white_pawn3.enpassant = True
-                    white_pawn3.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn4)[0]:
-                white_pawn4.pos = square
-                promotion(white_pawn4, square)
-                if white_pawn_move(white_pawn4)[1] == True:
-                    white_pawn4.enpassant = True
-                    white_pawn4.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn5)[0]:
-                white_pawn5.pos = square
-                promotion(white_pawn5, square)
-                if white_pawn_move(white_pawn5)[1] == True:
-                    white_pawn5.enpassant = True
-                    white_pawn5.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn6)[0]:
-                white_pawn6.pos = square
-                promotion(white_pawn6, square)
-                if white_pawn_move(white_pawn6)[1] == True:
-                    white_pawn6.enpassant = True
-                    white_pawn6.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn7)[0]:
-                white_pawn7.pos = square
-                promotion(white_pawn7, square)
-                if white_pawn_move(white_pawn7)[1] == True:
-                    white_pawn7.enpassant = True
-                    white_pawn7.two_move_turn = turn_count
-            elif square == white_pawn_move(white_pawn8)[0]:
-                white_pawn8.pos = square
-                promotion(white_pawn8, square)
-                if white_pawn_move(white_pawn8)[1] == True:
-                    white_pawn8.enpassant = True
-                    white_pawn8.two_move_turn = turn_count
+            for i in range(8):
+                temp_row, temp_col = rc_to_square(white_piece_list[i].pos)
+                if square[0] == temp_row:
+                    if square == black_pawn_move(black_pawn1)[0]:
+                        white_pawn1.pos = square
+                        promotion(black_pawn1, square)
+                        if white_pawn_move(black_pawn1)[1] == True:
+                            black_pawn1.enpassant = True
+                        continue
+                i += 1
 
     elif turn == "black":
         if square[0] == "O":
@@ -950,9 +912,8 @@ white_piece_list = [
 ]
 
 black_piece_list = [
-    black_rook1, black_rook2,
     black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_night1,
-    black_night2, black_bishop1, black_bishop2, black_queen, black_king
+    black_night2, black_bishop1, black_bishop2, black_rook1, black_rook2, black_queen, black_king
 ]
 
 pieces_list = [
