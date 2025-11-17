@@ -100,16 +100,15 @@ def move(square):
                 turn = turn_change(turn)
 
         else:
-            for i in range(8):
-                temp_row, temp_col = rc_to_square(white_piece_list[i].pos)
+            for i in range(len(white_pawn_list)):
+                temp_row, temp_col = rc_to_square(white_pawn_list[i].pos)
                 if square[0] == temp_row:
-                    if square == black_pawn_move(black_pawn1)[0]:
+                    if square == white_pawn_move(white_pawn_list[i])[0]:
                         white_pawn1.pos = square
-                        promotion(black_pawn1, square)
-                        if white_pawn_move(black_pawn1)[1] == True:
+                        promotion(white_pawn1, square)
+                        if white_pawn_move(white_pawn_list[i])[1] == True:
                             black_pawn1.enpassant = True
                         continue
-                i += 1
 
     elif turn == "black":
         if square[0] == "O":
@@ -910,6 +909,8 @@ white_piece_list = [
     white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8, white_night1,
     white_night2, white_rook1, white_rook2, white_bishop1, white_bishop2, white_queen, white_king
 ]
+
+white_pawn_list = [white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8]
 
 black_piece_list = [
     black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_night1,
