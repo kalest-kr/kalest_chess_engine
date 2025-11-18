@@ -100,14 +100,14 @@ def move(square):
                 turn = turn_change(turn)
 
         else:
-            for i in range(len(white_pawn_list)):
-                temp_row, temp_col = rc_to_square(white_pawn_list[i].pos)
-                if square[0] == temp_row:
-                    if square == white_pawn_move(white_pawn_list[i])[0]:
-                        white_pawn1.pos = square
-                        promotion(white_pawn1, square)
+            for i in range(len(white_pawn_list)): #폰 리스트를 돌아가면서 확인
+                temp_row, temp_col = rc_to_square(white_pawn_list[i].pos) #임시로 값을 슬라이싱
+                if square[0] == temp_row: #같은 파일에 있는지 확인
+                    if square == white_pawn_move(white_pawn_list[i])[0]: #원하는 수가 가능한 폰인지 확인
+                        white_pawn_list[i].pos = square #좌표값 변경
+                        promotion(white_pawn_list[i], square) #프로모션 체크
                         if white_pawn_move(white_pawn_list[i])[1] == True:
-                            black_pawn1.enpassant = True
+                            white_pawn_list[i].enpassant = True
                         continue
 
     elif turn == "black":
@@ -156,55 +156,17 @@ def move(square):
                 black_king.pos = square
                 turn = turn_change(turn)
                 white_king.king_move_check = True
+
         else:
-            if square == black_pawn_move(black_pawn1)[0]:
-                black_pawn1.pos = square
-                promotion(black_pawn1, square)
-                if black_pawn_move(black_pawn1)[1] == True:
-                    black_pawn1.enpassant = True
-                    black_pawn1.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn2)[0]:
-                black_pawn2.pos = square
-                promotion(black_pawn2, square)
-                if black_pawn_move(black_pawn2)[1] == True:
-                    black_pawn2.enpassant = True
-                    black_pawn2.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn3)[0]:
-                black_pawn3.pos = square
-                promotion(black_pawn3, square)
-                if black_pawn_move(black_pawn3)[1] == True:
-                    black_pawn3.enpassant = True
-                    black_pawn3.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn4)[0]:
-                black_pawn4.pos = square
-                promotion(black_pawn4, square)
-                if black_pawn_move(black_pawn4)[1] == True:
-                    black_pawn4.enpassant = True
-                    black_pawn4.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn5)[0]:
-                black_pawn5.pos = square
-                promotion(black_pawn5, square)
-                if black_pawn_move(black_pawn5)[1] == True:
-                    black_pawn5.enpassant = True
-                    black_pawn5.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn6)[0]:
-                black_pawn6.pos = square
-                promotion(black_pawn6, square)
-                if black_pawn_move(black_pawn6)[1] == True:
-                    black_pawn6.enpassant = True
-                    black_pawn6.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn7)[0]:
-                black_pawn7.pos = square
-                promotion(black_pawn7, square)
-                if black_pawn_move(black_pawn7)[1] == True:
-                    black_pawn7.enpassant = True
-                    black_pawn7.two_move_turn = turn_count
-            elif square == black_pawn_move(black_pawn8)[0]:
-                black_pawn8.pos = square
-                promotion(black_pawn8, square)
-                if black_pawn_move(black_pawn8)[1] == True:
-                    black_pawn8.enpassant = True
-                    black_pawn8.two_move_turn = turn_count
+            for i in range(len(black_pawn_list)): #폰 리스트를 돌아가면서 확인
+                temp_row, temp_col = rc_to_square(black_pawn_list[i].pos) #임시로 값을 슬라이싱
+                if square[0] == temp_row: #같은 파일에 있는지 확인
+                    if square == black_pawn_move(black_pawn_list[i])[0]: #원하는 수가 가능한 폰인지 확인
+                        black_pawn_list[i].pos = square #좌표값 변경
+                        promotion(black_pawn_list[i], square) #프로모션 체크
+                        if black_pawn_move(black_pawn_list[i])[1] == True:
+                            black_pawn_list[i].enpassant = True
+                        continue
 
 def white_pawn_move(piece):
     row, col = square_to_rc(piece.pos)
@@ -911,6 +873,8 @@ white_piece_list = [
 ]
 
 white_pawn_list = [white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8]
+
+black_pawn_list = [black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8]
 
 black_piece_list = [
     black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_night1,
