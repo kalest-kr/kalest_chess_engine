@@ -1,3 +1,5 @@
+#체크 구현, 스테일메이트, 체크 메이트
+
 files = ['a','b','c','d','e','f','g','h']  # 가로(col)
 ranks = ['8','7','6','5','4','3','2','1']  # 세로(row)
 
@@ -49,6 +51,7 @@ class piece:
         self.rook_move_check = False #캐슬링에서 룩의 움직임을 판별
         self.king_move_check = False #캐슬링에서 킹의 움직임 판별
         self.absolute_pin = False
+        self.check = False #기물이 체크를 걸는지 확인
 
 def move(square):
     global turn
@@ -84,10 +87,7 @@ def move(square):
                     if square == rook_move(i):
                         i.pos = square
                         turn = turn_change(turn)
-                        if i == white_rook1:
-                            i.rook_move_check = True
-                        if i == white_rook2:
-                            i.rook_move_check = True
+                        i.rook_move_check = True
         elif square[0] == "Q":
             for i in white_piece_list:
                 if i.role == "queen":
@@ -101,10 +101,13 @@ def move(square):
 
         else:
             for i in range(len(white_pawn_list)): #폰 리스트를 돌아가면서 확인
-                temp_row, temp_col = rc_to_square(white_pawn_list[i].pos) #임시로 값을 슬라이싱
+                temp_row, temp_col = square_to_rc(white_pawn_list[i].pos) #임시로 값을 슬라이싱
                 if square[0] == temp_row: #같은 파일에 있는지 확인
                     if square == white_pawn_move(white_pawn_list[i])[0]: #원하는 수가 가능한 폰인지 확인
                         white_pawn_list[i].pos = square #좌표값 변경
+                        if rc_to_square(temp_row + 1, temp_col + 1) == white_king.pos or rc_to_square(temp_row + 1, temp_col - 1) == white_king.pos:
+                            white_pawn_list[i].check = True
+
                         promotion(white_pawn_list[i], square) #프로모션 체크
                         if white_pawn_move(white_pawn_list[i])[1] == True:
                             white_pawn_list[i].enpassant = True
@@ -141,10 +144,7 @@ def move(square):
                     if square == rook_move(i):
                         i.pos = square
                         turn = turn_change(turn)
-                        if i == black_rook1:
-                            i.rook_move_check = True
-                        if i == black_rook2:
-                            i.rook_move_check = True
+                        i.rook_move_check = True
         elif square[0] == "Q":
             for i in black_piece_list:
                 if i.role == "queen":
@@ -159,7 +159,7 @@ def move(square):
 
         else:
             for i in range(len(black_pawn_list)): #폰 리스트를 돌아가면서 확인
-                temp_row, temp_col = rc_to_square(black_pawn_list[i].pos) #임시로 값을 슬라이싱
+                temp_row, temp_col = square_to_rc(black_pawn_list[i].pos) #임시로 값을 슬라이싱
                 if square[0] == temp_row: #같은 파일에 있는지 확인
                     if square == black_pawn_move(black_pawn_list[i])[0]: #원하는 수가 가능한 폰인지 확인
                         black_pawn_list[i].pos = square #좌표값 변경
@@ -296,45 +296,69 @@ def rook_move(piece):
             possible_moves.append(rc_to_square(row, col + i))
             if square_check(rc_to_square(row, col + i)) == False: #막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row, col + i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row, col + i) == black_king.pos:
+                            piece.check = True
+                    else:
+                        if rc_to_square(row, col + i) == white_king.pos:
+                            piece.check = True
                     possible_moves.append(rc_to_square(row, col + i))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row, col - i)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row, col - i))
-            if square_check(rc_to_square(row, col + i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
+            if square_check(rc_to_square(row, col - i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row, col - i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row, col - i) == black_king.pos:
+                            piece.check = True
+                    else:
+                        if rc_to_square(row, col - i) == white_king.pos:
+                            piece.check = True
                     possible_moves.append(rc_to_square(row, col - i))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves# 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(positive_row):
         if square_check(rc_to_square(row + i, col)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row + i, col))
             if square_check(rc_to_square(row + i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row + i, col), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row + i, col) == black_king.pos:
+                            piece.check = True
+                    else:
+                        if rc_to_square(row + i, col) == white_king.pos:
+                            piece.check = True
                     possible_moves.append(rc_to_square(row + i, col))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(row):
         if square_check(rc_to_square(row - i, col)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row - i, col))
             if square_check(rc_to_square(row + i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row - i, col), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row -i , col) == black_king.pos:
+                            piece.check = True
+                    else:
+                        if rc_to_square(row - i, col) == white_king.pos:
+                            piece.check = True
                     possible_moves.append(rc_to_square(row - i, col))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return  possible_moves# 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     return possible_moves
 
 def bishop_move(piece):
@@ -346,37 +370,69 @@ def bishop_move(piece):
             possible_moves.append(rc_to_square(row + i, col + i))
             if square_check(rc_to_square(row + i, col + i)) == False:
                 if color_check(rc_to_square(row + i, col + i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row + i, col + i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row + i, col + i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
                     possible_moves.append(rc_to_square(row + i, col + i))
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row - i, col - i)):  # 좌 하향 방향 이동 계산
             possible_moves.append(rc_to_square(row - i, col - i))
             if square_check(rc_to_square(row - i, col - i)) == False:
                 if color_check(rc_to_square(row - i, col - i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row - i, col - i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row - i, col - i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
                     possible_moves.append(rc_to_square(row - i, col - i))
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row + i, col - i)):  # 좌 상향 방향 이동 계산
             possible_moves.append(rc_to_square(row + i, col - i))
             if square_check(rc_to_square(row + i, col - i)) == False:
                 if color_check(rc_to_square(row + i, col - i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row + i, col - i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row + i, col - i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
                     possible_moves.append(rc_to_square(row + i, col - i))
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(positive_column):  # 이동은 이등변 삼각형으로 이루어지기 때문에 기준은 하나로 충분
         if square_check(rc_to_square(row - i, col + i)):  # 우 하향 방향 이동 계산
             possible_moves.append(rc_to_square(row - i, col + i))
             if square_check(rc_to_square(row - i, col + i)) == False:
                 if color_check(rc_to_square(row - i, col + i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row - i, col + i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row - i, col + i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
                     possible_moves.append(rc_to_square(row - i, col + i))
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     return possible_moves
 
 def queen_move(piece):
@@ -389,81 +445,145 @@ def queen_move(piece):
             possible_moves.append(rc_to_square(row, col + i))
             if square_check(rc_to_square(row, col + i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row, col + i), piece):
+                    if square_check(rc_to_square(row, col + i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
+                        if color_check(rc_to_square(row, col + i), piece):
+                            if define_color_in_def(piece) == True:
+                                if rc_to_square(row, col + i) == black_king.pos:
+                                    piece.check = True
+                            else:
+                                if rc_to_square(row, col + i) == white_king.pos:
+                                    piece.check = True
                     possible_moves.append(rc_to_square(row, col + i))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves  # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row, col - i)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row, col - i))
             if square_check(rc_to_square(row, col + i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row, col - i), piece):
+                    if square_check(rc_to_square(row, col - i)) == False:  # 막혔을 경우 잡을 수 있는지 계산
+                        if color_check(rc_to_square(row, col - i), piece):
+                            if define_color_in_def(piece) == True:
+                                if rc_to_square(row, col - i) == black_king.pos:
+                                    piece.check = True
+                            else:
+                                if rc_to_square(row, col - i) == white_king.pos:
+                                    piece.check = True
                     possible_moves.append(rc_to_square(row, col - i))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(positive_row):
         if square_check(rc_to_square(row + i, col)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row + i, col))
             if square_check(rc_to_square(row + i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row + i, col), piece):
+                    if square_check(rc_to_square(row + i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
+                        if color_check(rc_to_square(row + i, col), piece):
+                            if define_color_in_def(piece) == True:
+                                if rc_to_square(row + i, col) == black_king.pos:
+                                    piece.check = True
+                            else:
+                                if rc_to_square(row + i, col) == white_king.pos:
+                                    piece.check = True
                     possible_moves.append(rc_to_square(row + i, col))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(row):
         if square_check(rc_to_square(row - i, col)):  # 막히지 않고 갈 수 있는 칸을 계산
             possible_moves.append(rc_to_square(row - i, col))
             if square_check(rc_to_square(row + i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
                 if color_check(rc_to_square(row - i, col), piece):
+                    if square_check(rc_to_square(row - i, col)) == False:  # 막혔을 경우 잡을 수 있는지 계산
+                        if color_check(rc_to_square(row - i, col), piece):
+                            if define_color_in_def(piece) == True:
+                                if rc_to_square(row - i, col) == black_king.pos:
+                                    piece.check = True
+                            else:
+                                if rc_to_square(row - i, col) == white_king.pos:
+                                    piece.check = True
                     possible_moves.append(rc_to_square(row - i, col))
-                    return  # 잡는 수까지만 계산하고 값을 반환
+                    return possible_moves # 잡는 수까지만 계산하고 값을 반환
                 else:
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(positive_column):  # 이동은 이등변 삼각형으로 이루어지기 때문에 기준은 하나로 충분
         if square_check(rc_to_square(row + i, col + i)):  # 우 상향 방향 이동 계산. 막히지 않고 갈 수 있는 거리
             possible_moves.append(rc_to_square(row + i, col + i))
             if square_check(rc_to_square(row + i, col + i)) == False:
                 if color_check(rc_to_square(row + i, col + i), piece):
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row + i, col + i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row + i, col + i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
                     possible_moves.append(rc_to_square(row + i, col + i))
-                    return
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row - i, col - i)):  # 좌 하향 방향 이동 계산
             possible_moves.append(rc_to_square(row - i, col - i))
             if square_check(rc_to_square(row - i, col - i)) == False:
                 if color_check(rc_to_square(row - i, col - i), piece):
                     possible_moves.append(rc_to_square(row - i, col - i))
-                    return
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row - i, col - i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row - i, col - i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(col):
         if square_check(rc_to_square(row + i, col - i)):  # 좌 상향 방향 이동 계산
             possible_moves.append(rc_to_square(row + i, col - i))
             if square_check(rc_to_square(row + i, col - i)) == False:
                 if color_check(rc_to_square(row + i, col - i), piece):
                     possible_moves.append(rc_to_square(row + i, col - i))
-                    return
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row + i, col - i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row + i, col - i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
+                    return possible_moves
         else:
-            return
+            return possible_moves
     for i in range(positive_column):  # 이동은 이등변 삼각형으로 이루어지기 때문에 기준은 하나로 충분
         if square_check(rc_to_square(row - i, col + i)):  # 우 하향 방향 이동 계산
             possible_moves.append(rc_to_square(row - i, col + i))
             if square_check(rc_to_square(row - i, col + i)) == False:
                 if color_check(rc_to_square(row - i, col + i), piece):
                     possible_moves.append(rc_to_square(row - i, col + i))
-                    return
+                    if define_color_in_def(piece) == True:
+                        if rc_to_square(row - i, col + i) == black_king.pos:
+                            piece.check = True
+                            return piece.check
+                    else:
+                        if rc_to_square(row - i, col + i) == white_king.pos:
+                            piece.check = True
+                            return piece.check
+                    return possible_moves
         else:
-            return
+            return possible_moves
     return possible_moves
 
 def king_move(piece):
@@ -560,6 +680,7 @@ def white_short_castle(piece, piece2):
             return True
         else:
             return False
+    return True
 
 def white_long_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
@@ -595,6 +716,7 @@ def white_long_castle(piece, piece2):
             return True
         else:
             return False
+    return True
 
 def black_short_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
@@ -630,6 +752,7 @@ def black_short_castle(piece, piece2):
             return True
         else:
             return False
+    return True
 
 def black_long_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
@@ -666,6 +789,7 @@ def black_long_castle(piece, piece2):
             return True
         else:
             return False
+    return True
 
 def diagnol_pin(piece):
     row, col = square_to_rc(piece.pos)
@@ -824,6 +948,12 @@ def color_check(square: str, piece) -> bool:
         if p.pos == square and p.color != piece.color:
             return True
     return  False
+
+def define_color_in_def(piece):
+    if piece.color == "white":
+        return True
+    else:
+        return False
 
 white_pawn1 = piece("pawn", "white", "a2")
 white_pawn2 = piece("pawn", "white", "b2")
