@@ -262,27 +262,91 @@ def night_move(piece):
     possible_moves = []
     if row + 2 <= 8 and col + 1 <= 8:
         if color_check(rc_to_square(row + 2, col + 1), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row + 2, col + 1) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row + 2, col + 1) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row + 2, col + 1))
     if row + 2 <= 8 and col - 1 <= 8:
-        if color_check(rc_to_square(row + 2, col +- 1), piece):
+        if color_check(rc_to_square(row + 2, col - 1), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row + 2, col - 1) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row + 2, col - 1) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row + 2, col - 1))
     if row - 2 <= 8 and col + 1 <= 8:
         if color_check(rc_to_square(row - 2, col + 1), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row - 2, col + 1) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row - 2, col + 1) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row - 2, col + 1))
     if row - 2 <= 8 and col - 1 <= 8:
         if color_check(rc_to_square(row - 2, col - 1), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row - 2, col - 1) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row - 2, col - 1) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row - 2, col - 1))
     if row + 1 <= 8 and col + 2 <= 8:
         if color_check(rc_to_square(row + 1, col + 2), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row + 1, col + 2) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row + 1, col + 2) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row + 1, col + 2))
     if row - 1 <= 8 and col + 2 <= 8:
         if color_check(rc_to_square(row - 1, col + 2), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row - 1, col + 2) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row - 1, col + 2) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row - 1, col + 2))
     if row + 1 <= 8 and col - 2 <= 8:
         if color_check(rc_to_square(row + 1, col - 2), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row + 1, col - 2) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row + 1, col - 2) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row + 1, col - 2))
     if row - 1 <= 8 and col - 2 <= 8:
         if color_check(rc_to_square(row - 1, col - 2), piece):
+            if define_color_in_def(piece) == True:
+                if rc_to_square(row - 1, col - 2) == black_king.pos:
+                    piece.check = True
+                    return piece.check
+            else:
+                if rc_to_square(row - 1, col - 2) == white_king.pos:
+                    piece.check = True
+                    return piece.check
             possible_moves.append(rc_to_square(row - 1, col - 2))
     return possible_moves
 
