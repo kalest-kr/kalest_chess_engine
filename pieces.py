@@ -1,4 +1,4 @@
-#체크 구현, 스테일메이트, 체크 메이트
+#스테일메이트, 체크 메이트. 폰 움직임
 
 files = ['a','b','c','d','e','f','g','h']  # 가로(col)
 ranks = ['8','7','6','5','4','3','2','1']  # 세로(row)
@@ -55,253 +55,112 @@ class piece:
         self.check = False #기물이 체크를 걸는지 확인
         self.protected = False
 
-def possible_moves():
-    global possible_moves
-    possible_moves = []
-    if turn == "white":
-        if When_Checked_White(white_piece_list) != False:
-            possible_moves.append(When_Checked_White(white_piece_list))
-            print("possible moves:", possible_moves)
-        else:
-            for i in range(len(white_piece_list)):
-                if 0 <= i <= 7:
-                    possible_moves.append(white_pawn_move(white_piece_list[i]))
-                if 8 <= i <= 9:
-                    possible_moves.append(knight_move(white_piece_list[i]))
-                if 10 <= i <= 11:
-                    possible_moves.append(bishop_move(white_piece_list[i]))
-                if 12 <= i <= 13:
-                    possible_moves.append(rook_move(white_piece_list[i]))
-                if i == 14:
-                    possible_moves.append(queen_move(white_piece_list[i]))
-                if i == 15:
-                    possible_moves.append(king_move(white_piece_list[i]))
-            print("possible moves:", possible_moves)
-            return possible_moves
-    if turn == "white":
-        if When_Checked_white(white_piece_list) != False:
-            possible_moves.append(When_Checked_white(white_piece_list))
-            print("possible moves:", possible_moves)
-        else:
-            for i in range(len(white_piece_list)):
-                if 0 <= i <= 7:
-                    possible_moves.append(white_pawn_move(white_piece_list[i]))
-                if 8 <= i <= 9:
-                    possible_moves.append(knight_move(white_piece_list[i]))
-                if 10 <= i <= 11:
-                    possible_moves.append(bishop_move(white_piece_list[i]))
-                if 12 <= i <= 13:
-                    possible_moves.append(rook_move(white_piece_list[i]))
-                if i == 14:
-                    possible_moves.append(queen_move(white_piece_list[i]))
-                if i == 15:
-                    possible_moves.append(king_move(white_piece_list[i]))
-            print("possible moves:", possible_moves)
-            return possible_moves
-
-def move(square):
-    global turn
-    global turn_count
-    global position
-    possible_moves = []
-    if turn == "white":
-        position = square[-2]
-        if square[0] == "O":  # 캐슬링 판정
-            if square == "O-O":  # 숏캐슬
-                if white_short_castle(white_king, white_rook2):  # 캐슬 가능 여부 파악
-                    white_king.king_move_check = True  # 앞으로는 발동 못하도록 킹 값을 변경
-                    white_king.pos = 'g1'
-                    white_rook2.pos = 'f1'
-            elif square == "O-O-O":
-                if white_long_castle(white_king, white_rook1):
-                    white_king.king_move_check = True
-                    white_king.pos = 'c1'
-                    white_rook2.pos = 'd1'
-        if square[0] == "N":
-            for i in white_piece_list:  # 프로모션 기물을 위한 변경
-                if i.role == "knight":
-                    if square == knight_move(i):
-                        i.pos = position
-        elif square[0] == "B":
-            for i in white_piece_list:
-                if i.role == "bishop":
-                    if square == bishop_move(i):
-                        i.pos = position
-        elif square[0] == "R":
-            for i in white_piece_list:
-                if i.role == "rook":
-                    if square == rook_move(i):
-                        i.pos = position
-                        i.rook_move_check = True
-        elif square[0] == "Q":
-            for i in white_piece_list:
-                if i.role == "queen":
-                    if square == queen_move(i):
-                        i.pos = position
-        elif square[0] == "K":
-            if square == king_move(white_king):
-                white_king.pos = position
-
-        else:
-            for i in range(len(white_pawn_list)):  # 폰 리스트를 돌아가면서 확인
-                temp_row, temp_col = square_to_rc(white_pawn_list[i].pos)  # 임시로 값을 슬라이싱
-                if square[0] == temp_row:  # 같은 파일에 있는지 확인
-                    if square == white_pawn_move(white_pawn_list[i])[0]:  # 원하는 수가 가능한 폰인지 확인
-                        white_pawn_list[i].pos = position  # 좌표값 변경
-                        if rc_to_square(temp_row + 1, temp_col + 1) == white_king.pos or rc_to_square(temp_row + 1,
-                                                                                                      temp_col - 1) == white_king.pos:
-                            white_pawn_list[i].check = True
-
-                        promotion(white_pawn_list[i], square)  # 프로모션 체크
-                        if white_pawn_move(white_pawn_list[i])[1] == True:
-                            white_pawn_list[i].enpassant = True
-                        continue
-    if turn == "white":
-        position = square[-2]
-        if square[0] == "O":
-            if square == "O-O":
-                if white_short_castle(white_king, white_rook2):
-                    white_king.king_move_check = True
-                    white_king.pos = 'g8'
-                    white_rook2.pos = 'f8'
-            elif square == "O-O-O":
-                if white_long_castle(white_king, white_rook1):
-                    white_king.king_move_check = True
-                    white_king.pos = 'c8'
-                    white_rook2.pos = 'd8'
-        if square[0] == "N":
-            for i in white_piece_list:  # 프로모션 기물을 위한 변경
-                if i.role == "knight":
-                    if square == knight_move(i):
-                        i.pos = position
-        elif square[0] == "B":
-            for i in white_piece_list:
-                if i.role == "bishop":
-                    if square == bishop_move(i):
-                        i.pos = position
-        elif square[0] == "R":
-            for i in white_piece_list:
-                if i.role == "rook":
-                    if square == rook_move(i):
-                        i.pos = position
-                        i.rook_move_check = True
-        elif square[0] == "Q":
-            for i in white_piece_list:
-                if i.role == "queen":
-                    if square == queen_move(i):
-                        i.pos = position
-        elif square[0] == "K":
-            if square == king_move(white_king):
-                white_king.pos = position
-                white_king.king_move_check = True
-
-        else:
-            for i in range(len(white_pawn_list)):  # 폰 리스트를 돌아가면서 확인
-                temp_row, temp_col = square_to_rc(white_pawn_list[i].pos)  # 임시로 값을 슬라이싱
-                if square[0] == temp_row:  # 같은 파일에 있는지 확인
-                    if square == white_pawn_move(white_pawn_list[i])[0]:  # 원하는 수가 가능한 폰인지 확인
-                        white_pawn_list[i].pos = position  # 좌표값 변경
-                        promotion(white_pawn_list[i], square)  # 프로모션 체크
-                        if white_pawn_move(white_pawn_list[i])[1] == True:
-                            white_pawn_list[i].enpassant = True
-                        continue
-
 def white_pawn_move(piece):
     row, col = square_to_rc(piece.pos)
     possible_moves = []
+    if piece.active == True or piece.absolute_pin == True:
+        return possible_moves
+    if row == 2:
+        for i in range(2):
+            temp_row = row +  1
+            square = rc_to_square(temp_row, col)
+            if not square_check(square):
+                break
+            else: possible_moves.append(square)
     temp_row = row + 1
-    two_move = False
-    global turn_count
-    if piece.active == False:
-        return possible_moves
-    if piece.absolute_pin == True:
-        return possible_moves
-    if 0 <= temp_row <= 7:
-        if square_check(rc_to_square(temp_row, col)):#일반 움직임
-            possible_moves.append(rc_to_square(temp_row, col))
-        if row == 5 and 0 <= col + 1 <= 7: #우 앙파상 계산
-            temp_square = rc_to_square(row, col + 1) #앙파상 할 기물이 있는 칸
-            for p in pieces_list:
-                if p.pos == temp_square:
-                    if p.role == "pawn": #폰이 맞는지 확인
-                        if p.enpassant == True and p.two_move_turn == turn_count - 1 and p.color == "white": #다른색의 기물에 턴이 맞는지 파악
-                            possible_moves.append(temp_square) #가능한 수에 추가
-        if square_check(rc_to_square(temp_row, col)):
-            if row == 5 and 0 <= col - 1 <= 7: #좌 앙파상 계산
-                temp_square = rc_to_square(row, col - 1)
-                for p in pieces_list:
-                    if p.pos == temp_square:
-                        if p.role == "pawn":
-                            if p.enpassant == True and p.two_move_turn == turn_count - 1 and p.color == "white":
-                                possible_moves.append(temp_square)
-        if 0 <= col + 1 <= 7:  # 우측 기물 캡쳐
-            if color_check(rc_to_square(temp_row, col + 1), piece):
-                possible_moves.append(rc_to_square(temp_row, col + 1))
-        if 0 <= col - 1 <= 7:  # 좌측 기물 캡쳐
-            if color_check(rc_to_square(temp_row, col - 1), piece):
-                possible_moves.append(rc_to_square(temp_row, col - 1))
-        if row == 2: #출발지점 파악
-            if square_check(rc_to_square(temp_row, col)): #앞 1칸이 비었는지 확인
-                temp_row += 1
-                if square_check(rc_to_square(temp_row, col)): # 2번째 칸의 여부 확인
-                    possible_moves.append(rc_to_square(temp_row, col)) #가능한 수에 추가
-                    two_move = True
-    return possible_moves, two_move
+    if in_board(temp_row, col):
+        square = rc_to_square(temp_row, col)
+        possible_moves.append(square)
+
+    for i in range(-1, 2, 2):
+        temp_col = col +  i
+        if not in_board(temp_row, temp_col):
+            continue
+        square = rc_to_square(temp_row, temp_col)
+        if color_check(square, piece):
+            possible_moves.append(square)
+        else:
+            for i in range(len(white_piece_list)):
+                if white_piece_list[i].pos == square:
+                    white_piece_list[i].protected = True
+
+    if row == 5:
+        for i in range(-1, 2, 2):
+            temp_col = col + i
+            if not in_board(temp_row, temp_col):
+                continue
+            square = rc_to_square(temp_row, temp_col)
+            for i in range(len(black_pawn_list)):
+                if square == black_pawn_list[i].pos:
+                    if black_pawn_list[i].enpassant == True:
+                        if in_board(temp_row, temp_col):
+                            possible_moves.append(rc_to_square(temp_row, temp_col))
+    return possible_moves
+
 
 def black_pawn_move(piece):
     row, col = square_to_rc(piece.pos)
     possible_moves = []
+    if piece.active == True or piece.absolute_pin == True:
+        return possible_moves
+    if row == 7:
+        for i in range(2):
+            temp_row = row - 1
+            square = rc_to_square(temp_row, col)
+            if not square_check(square):
+                break
+            else:
+                possible_moves.append(square)
     temp_row = row - 1
-    two_move = False
-    global turn_count
-    if piece.active == False:
-        return possible_moves
-    if piece.absolute_pin == True:
-        return possible_moves
-    if 0 <= temp_row <= 8: #이동이 보드를 넘어선 안 됨
-        if square_check(rc_to_square(temp_row, col)): #일반 움직임
-            possible_moves.append(rc_to_square(temp_row, col))
-        if row == 4 and 0 <= col + 1 <= 7: #우측으로 앙파상
-            temp_square = rc_to_square(row, col + 1)
-            for p in pieces_list:
-                if p.pos == temp_square:
-                    if p.role == "pawn":
-                        if p.enpassant == True and p.two_move_turn == turn_count and p.color == "white":
-                            possible_moves.append(temp_square)
-        if square_check(rc_to_square(temp_row, col)):
-            if row == 4 and 0 <= col - 1 <= 7: #4랭크에서 열이 범위내에 있는지 식별
-                temp_square = rc_to_square(row, col - 1)
-                for p in pieces_list:
-                    if p.pos == temp_square:
-                        if p.role == "pawn":
-                            if p.enpassant == True and p.two_move_turn == turn_count and p.color == "white":
-                                possible_moves.append(temp_square)
-        if 0 <= col + 1 <= 8: #우측 기물 캡쳐
-            if color_check(rc_to_square(temp_row, col + 1), piece):
-                possible_moves.append(rc_to_square(temp_row, col + 1))
-        if 0 <= col - 1 <= 8: #좌측 기물 캡쳐
-            if color_check(rc_to_square(temp_row, col - 1), piece):
-                possible_moves.append(rc_to_square(temp_row, col - 1))
-        if row == 2:
-            if square_check(rc_to_square(temp_row, col)):
-                temp_row += 1
-                if square_check(rc_to_square(temp_row, col)):
-                    possible_moves.append(rc_to_square(temp_row, col))
-                    two_move = True
-    return possible_moves, two_move
+    if in_board(temp_row, col):
+        square = rc_to_square(temp_row, col)
+        possible_moves.append(square)
 
-def promotion(piece, square):
-    row, col = square_to_rc(piece.pos)
-    if row == 1 or row == 8: #보드 끝에 도달했는지 파악
-        promotion_piece = square.find("=") + 2 #기보 인식
-        if promotion_piece == "N":
-            piece.role = "knight"
-        if promotion_piece == "B":
-            piece.role = "bishop"
-        if promotion_piece == "R":
-            piece.role = "rook"
-        if promotion_piece == "Q":
-            piece.role = "queen"
+    for i in range(-1, 2, 2):
+        temp_col = col + i
+        if not in_board(temp_row, temp_col):
+            continue
+        square = rc_to_square(temp_row, temp_col)
+        if color_check(square, piece):
+            possible_moves.append(square)
+        else:
+            for i in range(len(white_piece_list)):
+                if white_piece_list[i].pos == square:
+                    white_piece_list[i].protected = True
+
+    if row ==4:
+        for i in range(-1, 2, 2):
+            temp_col = col + i
+            if not in_board(temp_row, temp_col):
+                continue
+            square = rc_to_square(temp_row, temp_col)
+            for i in range(len(white_pawn_list)):
+                if square == white_pawn_list[i].pos:
+                    if white_pawn_list[i].enpassant == True:
+                        if in_board(temp_row, temp_col):
+                            possible_moves.append(rc_to_square(temp_row, temp_col))
+    return possible_moves
+
+def promotion():
+    if turn == "white":
+        for i in range(len(white_pawn_list)):
+            row, col = square_to_rc(white_pawn_list[i].pos)
+            if  row == 8:
+                promotion_list = ["knight", "bishop", "rook", "queen"]
+                return promotion_list
+    else:
+        for i in range(len(black_pawn_list)):
+            row, col = square_to_rc(black_pawn_list[i].pos)
+            if row == 1:
+                promotion_list = ["knight", "bishop", "rook", "queen"]
+                return promotion_list
+
+def pawn_two_move(piece, square):
+    if piece.role == "pawn":
+        row, col = square_to_rc(piece.pos)
+        target_row, target_col = square_to_rc(square)
+        if abs(row - target_row) == 2:
+            piece.enpassant = True
 
 def knight_move(piece):
     row, col = square_to_rc(piece.pos)
@@ -733,6 +592,16 @@ def queen_move(piece):
 def king_move(piece):
     row, col = square_to_rc(piece.pos)
     possible_moves = []
+    if piece.color == "white":
+        if white_short_castle(piece, white_rook1):
+            possible_moves.append(rc_to_square(row, col + 2))
+        if white_long_castle(piece, white_rook2):
+            possible_moves.append(rc_to_square(row, col - 2))
+    if piece.color == "black":
+        if black_short_castle(piece, black_rook1):
+            possible_moves.append(rc_to_square(row, col + 2))
+        if black_long_castle(piece, black_rook2):
+            possible_moves.append(rc_to_square(row, col - 2))
     for i in range(-1, 2, 2):
         temp_row = row + 1
         if not in_board(temp_row, col + i):
@@ -965,7 +834,7 @@ def white_long_castle(piece, piece2):
             return False
     return True
 
-def white_short_castle(piece, piece2):
+def black_short_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
         if piece.king_move_check == False and piece2.rook_move_check == False\
                 and square_check('f8') and square_check('g8'):
@@ -1001,7 +870,7 @@ def white_short_castle(piece, piece2):
             return False
     return True
 
-def white_long_castle(piece, piece2):
+def black_long_castle(piece, piece2):
     if piece.role == "king" and piece2.role == "rook":
         if piece.king_move_check == False and piece2.rook_move_check == False\
                 and square_check('c8') and square_check('d8'): #기본 조건인 킹 움직임과 룩 움직임 그리고 중간 칸이 비었는지 여부 확인
@@ -1038,7 +907,23 @@ def white_long_castle(piece, piece2):
             return False
     return True
 
-def diagnol_pin(piece):
+def castle_check(piece, square):
+    row, col = square_to_rc(piece.pos)
+    target_row, target_col = square_to_rc(square.pos)
+    if piece.role == "king":
+        if turn == "white":
+            if col - target_col == 2:
+                white_rook1.pos = "f1"
+            if col - target_col == -2:
+                white_rook2.pos = "d1"
+        else:
+            if col - target_col == 2:
+                black_rook1.pos = "f8"
+            if col - target_col == -2:
+                black_rook2.pos = "d8"
+
+
+def diagonal_pin(piece):
     row, col = square_to_rc(piece.pos)
     positive_row = 8 - row
     positive_col = 8 - col
@@ -1220,6 +1105,362 @@ def CheckMate(possible_moves):
                 else:
                     return "stalemate"
 
+def when_checked_white(turn):
+    check_pieces = []
+    possible_moves = []
+    attack_list = []
+    if turn == "white":
+        for i in range(len(black_piece_list)):
+            if black_piece_list[i].check == True:
+                check_pieces.append(black_piece_list[i])
+                if len(check_pieces) > 1:
+                    possible_moves.append(king_move(white_king))
+                    return possible_moves
+                if black_piece_list[i].role == "pawn":
+                    attack_list.append(black_piece_list[i].pos)
+                    possible_moves.extend(check_move(attack_list, "white"))
+                if black_piece_list[i].role == "knight":
+                    attack_list.append(black_piece_list[i].pos)
+                    possible_moves.extend(check_move(attack_list, "white"))
+                if black_piece_list[i].role == "rook":
+                    row, col = square_to_rc(black_piece_list[i])
+                    target_row, target_col = square_to_rc(white_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                        elif cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_col != 0:
+                        if cal_col < 0:
+                            for i in range(len(cal_col) + 1):
+                                col += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                        elif cal_col > 0:
+                            for i in range(len(cal_col) + 1):
+                                col -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                if black_piece_list[i].role == "bishop":
+                    row, col = square_to_rc(black_piece_list[i])
+                    target_row, target_col = square_to_rc(white_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row < 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row > 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row > 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row < 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                if black_piece_list[i].role == "queen":
+                    row, col = square_to_rc(black_piece_list[i])
+                    target_row, target_col = square_to_rc(white_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row < 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row > 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row > 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row < 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "white"))
+                    if cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                        if cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_col != 0:
+                        if cal_col < 0:
+                            for i in range(len(cal_col) + 1):
+                                col += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                        if cal_col > 0:
+                            for i in range(len(cal_col) + 1):
+                                col -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                    elif cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+                        elif cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "white"))
+    if turn == "black":
+        for i in range(len(white_piece_list)):
+            if white_piece_list[i].check == True:
+                check_pieces.append(white_piece_list[i])
+                if len(check_pieces) > 1:
+                    possible_moves.append(king_move(black_king))
+                    return possible_moves
+                if white_piece_list[i].role == "pawn":
+                    attack_list.append(white_piece_list[i].pos)
+                    possible_moves.extend(check_move(attack_list, "black"))
+                if white_piece_list[i].role == "knight":
+                    attack_list.append(white_piece_list[i].pos)
+                    possible_moves.extend(check_move(attack_list, "black"))
+                if white_piece_list[i].role == "rook":
+                    row, col = square_to_rc(white_piece_list[i])
+                    target_row, target_col = square_to_rc(black_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                        elif cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_col != 0:
+                        if cal_col < 0:
+                            for i in range(len(cal_col) + 1):
+                                col += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                        elif cal_col > 0:
+                            for i in range(len(cal_col) + 1):
+                                col -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                if white_piece_list[i].role == "bishop":
+                    row, col = square_to_rc(white_piece_list[i])
+                    target_row, target_col = square_to_rc(black_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row < 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row > 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row > 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row < 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                if white_piece_list[i].role == "queen":
+                    row, col = square_to_rc(white_piece_list[i])
+                    target_row, target_col = square_to_rc(black_king.pos)
+                    cal_row = row - target_row
+                    cal_col = col - target_col
+                    if cal_row < 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row > 0 and cal_col < 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col += i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row > 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row -= i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row < 0 and cal_col > 0:
+                        for i in range(len(cal_row) + 1):
+                            row += i
+                            col -= i
+                            square = rc_to_square(row, col)
+                            attack_list.append(square)
+                            possible_moves.extend(check_move(attack_list, "black"))
+                    if cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                        if cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_col != 0:
+                        if cal_col < 0:
+                            for i in range(len(cal_col) + 1):
+                                col += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                        if cal_col > 0:
+                            for i in range(len(cal_col) + 1):
+                                col -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                    elif cal_row != 0:
+                        if cal_row < 0:
+                            for i in range(len(cal_row) + 1):
+                                row += i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+                        elif cal_row > 0:
+                            for i in range(len(cal_row) + 1):
+                                row -= i
+                                square = rc_to_square(row, col)
+                                attack_list.append(square)
+                                possible_moves.extend(check_move(attack_list, "black"))
+    return possible_moves
+
+def check_move(attack_list, color):
+    possible_moves = []
+    if color == "white":
+        for i in range(len(white_piece_list)):
+            if white_piece_list[i].role == "pawn":
+                piece_move_list = white_pawn_move(white_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if white_piece_list[i].role == "knight":
+                piece_move_list = knight_move(white_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if white_piece_list[i].role == "bishop":
+                piece_move_list = bishop_move(white_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if white_piece_list[i].role == "rook":
+                piece_move_list = rook_move(white_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if white_piece_list[i].role == "queen":
+                piece_move_list = queen_move(white_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if white_piece_list[i].role == "king":
+                possible_moves.extend(king_move(white_piece_list[i]))
+            return possible_moves
+    if color == "black":
+        for i in range(len(black_piece_list)):
+            if black_piece_list[i].role == "pawn":
+                piece_move_list = black_pawn_move(black_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if black_piece_list[i].role == "knight":
+                piece_move_list = knight_move(black_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if black_piece_list[i].role == "bishop":
+                piece_move_list = bishop_move(black_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if black_piece_list[i].role == "rook":
+                piece_move_list = rook_move(black_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if black_piece_list[i].role == "queen":
+                piece_move_list = queen_move(black_piece_list[i])
+                sorted_list = [i for i in piece_move_list if i in attack_list]
+                possible_moves.extend(sorted_list)
+            if black_piece_list[i].role == "king":
+                possible_moves.extend(king_move(black_piece_list[i]))
+            return possible_moves
 
 white_pawn1 = piece("pawn", "white", "a2")
 white_pawn2 = piece("pawn", "white", "b2")
@@ -1289,7 +1530,6 @@ while True:
     for i in range(len(pieces_list)):
         pieces_list[i].check = False
 
-    possible_moves()
     input_move = input("move:", )
 
     pos = input_move[-2]
@@ -1306,22 +1546,20 @@ while True:
     move(input_move)
 
     if turn == "white":
-        diagnol_pin(white_queen)
-        diagnol_pin(white_bishop1)
-        diagnol_pin(white_bishop2)
+        diagonal_pin(white_queen)
+        diagonal_pin(white_bishop1)
+        diagonal_pin(white_bishop2)
         vertical_pin(white_queen)
         vertical_pin(white_rook1)
         vertical_pin(white_rook2)
 
     if turn == "white":
-        diagnol_pin(white_queen)
-        diagnol_pin(white_bishop1)
-        diagnol_pin(white_bishop2)
+        diagonal_pin(white_queen)
+        diagonal_pin(white_bishop1)
+        diagonal_pin(white_bishop2)
         vertical_pin(white_queen)
         vertical_pin(white_rook1)
         vertical_pin(white_rook2)
-
-    CheckMate(possible_moves())
 
     turn, turn_count = turn_change(turn)
 
