@@ -442,7 +442,7 @@ def rook_move(piece):
             else:
                 for i in range(len(white_piece_list)):
                     if sq == white_piece_list[i].pos:
-                        white_piece_list[i].protected = True
+                        black_piece_list[i].protected = True
         break
 
     # ← (row, col-i)
@@ -474,9 +474,9 @@ def rook_move(piece):
                     if sq == white_piece_list[i].pos:
                         white_piece_list[i].protected = True
             else:
-                for i in range(len(white_piece_list)):
-                    if sq == white_piece_list[i].pos:
-                        white_piece_list[i].protected = True
+                for i in range(len(black_piece_list)):
+                    if sq == black_piece_list[i].pos:
+                        black_piece_list[i].protected = True
         break
 
     # ↑ (row+i, col)
@@ -510,7 +510,7 @@ def rook_move(piece):
             else:
                 for i in range(len(white_piece_list)):
                     if sq == white_piece_list[i].pos:
-                        white_piece_list[i].protected = True
+                        black_piece_list[i].protected = True
         break
 
     # ↓ (row-i, col)
@@ -544,7 +544,7 @@ def rook_move(piece):
             else:
                 for i in range(len(white_piece_list)):
                     if sq == white_piece_list[i].pos:
-                        white_piece_list[i].protected = True
+                        black_piece_list[i].protected = True
         break
 
     return possible_moves
@@ -867,7 +867,7 @@ def king_attack_square(piece):
     for i in range(-1, 2, 2):
         if not in_board(row + i, col):
             continue
-        target_square = rc_to_square(row, col + i)
+        target_square = rc_to_square(row + i, col)
         attack_list.append(target_square)
     return attack_list
 
@@ -1041,8 +1041,8 @@ def diagonal_pin(piece):
     temp_piece_list = []
     if min_val >= 2: #두칸 이상 남았을 경우만 계산
         for i in range(min_val):
-            temp_row = row + 1
-            temp_col = col + 1
+            temp_row = row + i
+            temp_col = col + i
             temp_square = rc_to_square(temp_row, temp_col)
             if square_check(temp_square) == False: #기물의 존재 여부 확인
                 for p in pieces_list:
@@ -1060,8 +1060,8 @@ def diagonal_pin(piece):
     temp_piece_list = []
     if min_val >= 2:
         for i in range(min_val):
-            temp_row = row + 1
-            temp_col = col - 1
+            temp_row = row + i
+            temp_col = col - i
             temp_square = rc_to_square(temp_row, temp_col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1079,8 +1079,8 @@ def diagonal_pin(piece):
     temp_piece_list = []
     if min_val >= 2:
         for i in range(min_val):
-            temp_row = row - 1
-            temp_col = col - 1
+            temp_row = row - i
+            temp_col = col - i
             temp_square = rc_to_square(temp_row, temp_col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1098,8 +1098,8 @@ def diagonal_pin(piece):
     temp_piece_list = []
     if min_val >= 2:
         for i in range(min_val):
-            temp_row = row - 1
-            temp_col = col + 1
+            temp_row = row - i
+            temp_col = col + i
             temp_square = rc_to_square(temp_row, temp_col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1121,7 +1121,7 @@ def vertical_pin(piece):
     temp_piece_list = []
     if positive_row >= 2:
         for i in range(positive_row):
-            temp_row = row + 1
+            temp_row = row + i
             temp_square = rc_to_square(temp_row, col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1138,7 +1138,7 @@ def vertical_pin(piece):
     temp_piece_list = []
     if col >= 2:
         for i in range(col):
-            temp_col = col - 1
+            temp_col = col - i
             temp_square = rc_to_square(row, temp_col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1155,7 +1155,7 @@ def vertical_pin(piece):
     temp_piece_list = []
     if row >= 2:
         for i in range(row):
-            temp_row = row - 1
+            temp_row = row - i
             temp_square = rc_to_square(temp_row, col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1172,7 +1172,7 @@ def vertical_pin(piece):
     temp_piece_list = []
     if positive_col >= 2:
         for i in range(positive_col):
-            temp_col = col + 1
+            temp_col = col + i
             temp_square = rc_to_square(row, temp_col)
             if square_check(temp_square) == False:
                 for p in pieces_list:
@@ -1243,97 +1243,97 @@ def when_checked(turn):
                     attack_list.append(black_piece_list[i].pos)
                     possible_moves.extend(check_move(attack_list, "white"))
                 if black_piece_list[i].role == "rook":
-                    row, col = square_to_rc(black_piece_list[i])
+                    row, col = square_to_rc(black_piece_list[i].pos)
                     target_row, target_col = square_to_rc(white_king.pos)
                     cal_row = row - target_row
                     cal_col = col - target_col
                     if cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                         elif cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_col != 0:
                         if cal_col < 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                         elif cal_col > 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                 if black_piece_list[i].role == "bishop":
-                    row, col = square_to_rc(black_piece_list[i])
+                    row, col = square_to_rc(black_piece_list[i].pos)
                     target_row, target_col = square_to_rc(white_king.pos)
                     cal_row = row - target_row
                     cal_col = col - target_col
                     if cal_row < 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row > 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row > 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col -= i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row < 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col -= i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                 if black_piece_list[i].role == "queen":
-                    row, col = square_to_rc(black_piece_list[i])
+                    row, col = square_to_rc(black_piece_list[i].pos)
                     target_row, target_col = square_to_rc(white_king.pos)
                     cal_row = row - target_row
                     cal_col = col - target_col
                     if cal_row < 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row > 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row > 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col -= i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row < 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col -= i
                             square = rc_to_square(row, col)
@@ -1341,39 +1341,39 @@ def when_checked(turn):
                             possible_moves.extend(check_move(attack_list, "white"))
                     if cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                         if cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_col != 0:
                         if cal_col < 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                         if cal_col > 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                     elif cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "white"))
                         elif cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
@@ -1398,26 +1398,26 @@ def when_checked(turn):
                     cal_col = col - target_col
                     if cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                         elif cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_col != 0:
                         if cal_col < 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                         elif cal_col > 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
@@ -1428,28 +1428,28 @@ def when_checked(turn):
                     cal_row = row - target_row
                     cal_col = col - target_col
                     if cal_row < 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row > 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row > 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col -= i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row < 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col -= i
                             square = rc_to_square(row, col)
@@ -1461,28 +1461,28 @@ def when_checked(turn):
                     cal_row = row - target_row
                     cal_col = col - target_col
                     if cal_row < 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row > 0 and cal_col < 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col += i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row > 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row -= i
                             col -= i
                             square = rc_to_square(row, col)
                             attack_list.append(square)
                             possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row < 0 and cal_col > 0:
-                        for i in range(len(cal_row) + 1):
+                        for i in range(abs(cal_row) + 1):
                             row += i
                             col -= i
                             square = rc_to_square(row, col)
@@ -1490,39 +1490,39 @@ def when_checked(turn):
                             possible_moves.extend(check_move(attack_list, "black"))
                     if cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                         if cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_col != 0:
                         if cal_col < 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                         if cal_col > 0:
-                            for i in range(len(cal_col) + 1):
+                            for i in range(abs(cal_col) + 1):
                                 col -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                     elif cal_row != 0:
                         if cal_row < 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row += i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
                                 possible_moves.extend(check_move(attack_list, "black"))
                         elif cal_row > 0:
-                            for i in range(len(cal_row) + 1):
+                            for i in range(abs(cal_row) + 1):
                                 row -= i
                                 square = rc_to_square(row, col)
                                 attack_list.append(square)
@@ -1642,23 +1642,12 @@ black_piece_list = [
 
 pieces_list = [
     white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8, white_knight1,
-    white_knight2, white_rook1, white_rook2, white_bishop1, white_bishop2, white_queen, white_king, white_rook1, white_rook2,
+    white_knight2, white_rook1, white_rook2, white_bishop1, white_bishop2, white_queen, white_king,
     black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_knight1,
     black_knight2, black_bishop1, black_bishop2, black_rook1, black_rook2, black_queen, black_king
 ]
 
 while True:
-
-    move = move_list(turn)
-
-    print(move)
-
-    move1 = int(input())
-    move2 = int(input())
-
-    move_choice(move1, move2, move)
-
-    print(move_choice(move1, move2, move))
 
     diagonal_pin(white_bishop1)
     diagonal_pin(white_bishop2)
@@ -1671,6 +1660,21 @@ while True:
     diagonal_pin(black_queen)
     vertical_pin(black_rook1)
     vertical_pin(black_rook2)
+
+    move = move_list(turn)
+
+    print(move)
+
+    move1 = int(input())
+    move2 = int(input())
+
+    move_choice(move1, move2, move)
+
+    print(move_choice(move1, move2, move))
+
+    for i in range(len(pieces_list)):
+        pieces_list[i].absolute_pin = False
+        pieces_list[i].protected = False
 
     turn, turn_count = turn_change(turn, turn_count)
 
