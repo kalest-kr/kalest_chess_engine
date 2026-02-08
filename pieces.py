@@ -1,4 +1,5 @@
-#스테일메이트, 체크 메이트. 폰 움직임
+from PIL import Image, ImageDraw
+#스테일메이트, 체크 메이트. 폰 움직임, 기물의 active를 기반으로 처리 여부 결정
 
 files = ['a','b','c','d','e','f','g','h']  # 가로(col)
 ranks = ['1','2','3','4','5','6','7','8']  # 세로(row)
@@ -93,6 +94,9 @@ def move_list(turn):
 def move_choice(move1, move2, possible_moves):
     if turn == "white":
         castle_check(white_king, possible_moves[move1][move2])
+        for i in range(len(black_piece_list)):
+            if possible_moves[move1][move2] == black_piece_list[i].pos:
+                black_piece_list[i].active = False
         white_piece_list[move1].pos = possible_moves[move1][move2]
         if white_piece_list[move1] == white_king:
             white_king.king_move_check = True
@@ -107,6 +111,9 @@ def move_choice(move1, move2, possible_moves):
             black_piece_list[i].enpassant = False
     if turn == "black":
         castle_check(black_king, possible_moves[move1][move2])
+        for i in range(len(white_piece_list)):
+            if possible_moves[move1][move2] == white_piece_list[i].pos:
+                white_piece_list[i].active = False
         black_piece_list[move1].pos = possible_moves[move1][move2]
         if black_piece_list[move1] == black_king:
             black_king.king_move_check = True
@@ -164,6 +171,22 @@ def white_pawn_move(piece):
                             possible_moves.append(rc_to_square(temp_row, temp_col))
     return possible_moves
 
+def white_pawn_attack(piece):
+    row, col = square_to_rc(piece.pos)
+    possible_moves = []
+    temp_row = row + 1
+    for i in range(-1, 2, 2):
+        temp_col = col +  i
+        if not in_board(temp_row, temp_col):
+            continue
+        square = rc_to_square(temp_row, temp_col)
+        if color_check(square, piece):
+            possible_moves.append(square)
+        else:
+            for i in range(len(white_piece_list)):
+                if white_piece_list[i].pos == square:
+                    white_piece_list[i].protected = True
+    return possible_moves
 
 def black_pawn_move(piece):
     row, col = square_to_rc(piece.pos)
@@ -209,6 +232,22 @@ def black_pawn_move(piece):
                             possible_moves.append(rc_to_square(temp_row, temp_col))
     return possible_moves
 
+def black_pawn_attack(piece):
+    row, col = square_to_rc(piece.pos)
+    possible_moves = []
+    temp_row = row - 1
+    for i in range(-1, 2, 2):
+        temp_col = col +  i
+        if not in_board(temp_row, temp_col):
+            continue
+        square = rc_to_square(temp_row, temp_col)
+        if color_check(square, piece):
+            possible_moves.append(square)
+        else:
+            for i in range(len(white_piece_list)):
+                if white_piece_list[i].pos == square:
+                    white_piece_list[i].protected = True
+    return possible_moves
 
 def promotion():
     if turn == "white":
@@ -771,7 +810,7 @@ def king_move(piece):
     if define_color_in_def(piece):
         for i in range(len(black_piece_list)):
             if black_piece_list[i].role == "pawn":
-                attack_square.extend(black_pawn_move(black_piece_list[i]))
+                attack_square.extend(black_pawn_attack(black_piece_list[i]))
             if black_piece_list[i].role == "knight":
                 attack_square.extend(knight_move(black_piece_list[i]))
             if black_piece_list[i].role == "bishop":
@@ -789,7 +828,7 @@ def king_move(piece):
     else:
         for i in range(len(white_piece_list)):
             if white_piece_list[i].role == "pawn":
-                attack_square.extend(white_pawn_move(white_piece_list[i]))
+                attack_square.extend(white_pawn_attack(white_piece_list[i]))
             if white_piece_list[i].role == "knight":
                 attack_square.extend(knight_move(white_piece_list[i]))
             if white_piece_list[i].role == "bishop":
@@ -1150,13 +1189,13 @@ def vertical_pin(piece):
 
 def square_check(square: str) -> bool:
     for p in pieces_list:
-        if p.pos == square:
+        if p.pos == square and p.active == True:
             return False
     return True
 
 def color_check(square: str, piece) -> bool:
     for p in pieces_list:
-        if p.pos == square and p.color != piece.color:
+        if p.pos == square and p.color != piece.color and p.active == True:
             return True
     return  False
 
@@ -1543,6 +1582,8 @@ def check_move(attack_list, color):
                 possible_moves.extend(king_move(black_piece_list[i]))
             return possible_moves
 
+
+
 white_pawn1 = piece("pawn", "white", "a2")
 white_pawn2 = piece("pawn", "white", "b2")
 white_pawn3 = piece("pawn", "white", "c2")
@@ -1603,7 +1644,7 @@ pieces_list = [
     white_pawn1, white_pawn2, white_pawn3, white_pawn4,white_pawn5, white_pawn6, white_pawn7, white_pawn8, white_knight1,
     white_knight2, white_rook1, white_rook2, white_bishop1, white_bishop2, white_queen, white_king, white_rook1, white_rook2,
     black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8, black_knight1,
-    black_knight2, black_bishop1, black_bishop2, black_queen, black_king
+    black_knight2, black_bishop1, black_bishop2, black_rook1, black_rook2, black_queen, black_king
 ]
 
 while True:
@@ -1633,4 +1674,43 @@ while True:
 
     turn, turn_count = turn_change(turn, turn_count)
 
+    # 빈 이미지 생성 (RGB, 크기: 800x800, 색상: 흰색)
+    image = Image.new("RGB", (640, 640), color="white")
+
+    # 이미지를 조작할 도구 생성
+    draw = ImageDraw.Draw(image)
+
+    # 직사각형 패턴 그리기
+    for a in range(0, 8, 2):
+        for i in range(4):  # 반복문을 통해 세 줄 생성
+            # 첫 번째 직사각형 (흰색)
+            draw.rectangle((0 + a * 80, 160 * i, 80 + a * 80, 160 * i + 80), fill="white", outline="black")
+
+            # 두 번째 직사각형 (녹색)
+            draw.rectangle((0 + a * 80, 160 * i + 80, 80 + a * 80, 160 * i + 160), fill="green", outline="black")
+
+    for a in range(1, 9, 2):
+        for i in range(4):  # 반복문을 통해 세 줄 생성
+            # 첫 번째 직사각형 (흰색)
+            draw.rectangle((0 + a * 80, 160 * i, 80 + a * 80, 160 * i + 80), fill="green", outline="black")
+
+            # 두 번째 직사각형 (녹색)
+            draw.rectangle((0 + a * 80, 160 * i + 80, 80 + a * 80, 160 * i + 160), fill="white", outline="black")
+
+    for p in pieces_list:
+        if p.active == True:
+            y, x = square_to_rc(p.pos)
+
+            color = p.color.lower()  # "white"/"black"
+            role = p.role.lower()  # "pawn"...
+
+            path = f"C:/Users/ginok/Downloads/chess_pieces_80x80_transparent/{color}_{role}.png"
+            piece_img = Image.open(path).convert("RGBA")
+
+            image.paste(piece_img, (80 * x, 560 - 80 * y), piece_img)
+        else:
+            continue
+
+    image.save("generated_image.png")
+    image.show()
     print(CheckMate(move_list(turn)))
