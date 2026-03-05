@@ -277,3 +277,41 @@ class GridWorld:
         def reward(self, state, action, next_state):
             return self.reward_map[next_state]
 
+env = GridWorld()
+
+from collections import defaultdict
+
+v = defaultdict(lambda: 0) #auto reset to prevent error. returns 0 if the value does not exist
+
+pick = defaultdict(lambda: {0: 0.25, 1: 0.25, 2: 0.25, 3: 0.25})
+
+#반복 정책 평가
+def eval_onestep(pick, env, gamma=0.9):
+    for state in env.states():
+        if state == env.goal_state:
+            v[state] = 0
+            continue
+        action_probs = pick[state]
+        new_v = 0
+
+        for action, action_probs in action_probs.items():
+            next_state = env.next_state(state, action)
+            r = env.reward(state, action, next_state)
+            new_v += action_probs * (r + gamma * v[next_state])
+        v[state] = new_v
+    return v
+
+def policy_eval(pick, v, env, gamma, threshold=0.001):
+    while True:
+        old_v = v.copy()
+        v = eval_onestep(pick, env, gamma)
+
+        delta = 0
+        for state in v.keys():
+            t = abs(v[state] - old_v[state])
+            if delta < t:
+                delta = t
+
+        if delta < threshold:
+            break
+    return v
