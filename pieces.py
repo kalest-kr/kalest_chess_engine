@@ -75,15 +75,15 @@ def move_list(turn):
         for i in range(len(white_piece_list)):
             if white_piece_list[i].role == "pawn":
                 possible_moves.append(white_pawn_move(white_piece_list[i]))
-            if white_piece_list[i].role == "knight":
+            elif white_piece_list[i].role == "knight":
                 possible_moves.append(knight_move(white_piece_list[i]))
-            if white_piece_list[i].role == "bishop":
+            elif white_piece_list[i].role == "bishop":
                 possible_moves.append(bishop_move(white_piece_list[i]))
-            if white_piece_list[i].role == "rook":
+            elif white_piece_list[i].role == "rook":
                 possible_moves.append(rook_move(white_piece_list[i]))
-            if white_piece_list[i].role == "queen":
+            elif white_piece_list[i].role == "queen":
                 possible_moves.append(queen_move(white_piece_list[i]))
-            if white_piece_list[i].role == "king":
+            elif white_piece_list[i].role == "king":
                 possible_moves.append(king_move(white_piece_list[i]))
         return possible_moves
     if turn == 'black':
@@ -96,24 +96,24 @@ def move_list(turn):
         for i in range(len(black_piece_list)):
             if black_piece_list[i].role == "pawn":
                 possible_moves.append(black_pawn_move(black_piece_list[i]))
-            if black_piece_list[i].role == "knight":
+            elif black_piece_list[i].role == "knight":
                 possible_moves.append(knight_move(black_piece_list[i]))
-            if black_piece_list[i].role == "bishop":
+            elif black_piece_list[i].role == "bishop":
                 possible_moves.append(bishop_move(black_piece_list[i]))
-            if black_piece_list[i].role == "rook":
+            elif black_piece_list[i].role == "rook":
                 possible_moves.append(rook_move(black_piece_list[i]))
-            if black_piece_list[i].role == "queen":
+            elif black_piece_list[i].role == "queen":
                 possible_moves.append(queen_move(black_piece_list[i]))
-            if black_piece_list[i].role == "king":
+            elif black_piece_list[i].role == "king":
                 possible_moves.append(king_move(black_piece_list[i]))
         return possible_moves
 
 def move_choice(move1, move2, possible_moves):
     if turn == "white":
-        castle_check(white_piece_list[move1], possible_moves[move1][move2])
         for i in range(len(black_piece_list)):
             if possible_moves[move1][move2] == black_piece_list[i].pos:
                 black_piece_list[i].active = False
+                return
         white_piece_list[move1].pos = possible_moves[move1][move2]
         if white_piece_list[move1] == white_king:
             white_king.king_move_check = True
@@ -122,15 +122,15 @@ def move_choice(move1, move2, possible_moves):
         if white_piece_list[move1] == white_rook2:
             white_rook2.rook_move_check = True
         promotion()
-        when_checked(turn)
         for i in range(len(black_piece_list)):
             black_piece_list[i].check = False
             black_piece_list[i].enpassant = False
+        return when_checked(turn), white_king.king_move_check, white_rook1.rook_move_check, white_rook2.rook_move_check
     if turn == "black":
-        castle_check(black_piece_list[move1], possible_moves[move1][move2])
         for i in range(len(white_piece_list)):
             if possible_moves[move1][move2] == white_piece_list[i].pos:
                 white_piece_list[i].active = False
+                return
         black_piece_list[move1].pos = possible_moves[move1][move2]
         if black_piece_list[move1] == black_king:
             black_king.king_move_check = True
@@ -139,11 +139,10 @@ def move_choice(move1, move2, possible_moves):
         if black_piece_list[move1] == black_rook2:
             black_rook2.rook_move_check = True
         promotion()
-        when_checked(turn)
         for i in range(len(white_piece_list)):
             white_piece_list[i].check = False
             white_piece_list[i].enpassant = False
-
+        return when_checked(turn), black_king.king_move_check, black_rook1.rook_move_check, black_rook2.rook_move_check
 
 
 def flatten_moves(turn):
@@ -1126,30 +1125,6 @@ def black_long_castle(piece, piece2):
         return False
     return False
 
-def castle_check(piece, square):
-    row, col = square_to_rc(piece.pos)
-    target_row, target_col = square_to_rc(square)
-    if piece.role == "king":
-        if turn == "white":
-            if col - target_col == 2:
-                white_rook1.pos = "d1"
-                white_king.pos = "c1"
-                white_king.king_move_check = True
-            if col - target_col == -2:
-                white_rook2.pos = "f1"
-                white_king.pos = "g1"
-                white_king.king_move_check = True
-        else:
-            if col - target_col == 2:
-                black_rook1.pos = "d8"
-                black_king.pos = "c8"
-                black_king.king_move_check = True
-            if col - target_col == -2:
-                black_rook2.pos = "f8"
-                black_king.pos = "g8"
-                black_king.king_move_check = True
-
-
 def diagonal_pin(piece):
     row, col = square_to_rc(piece.pos)
     positive_row = 8 - row
@@ -1747,23 +1722,23 @@ def check_move(attack_list, color):
         for i in range(len(white_piece_list)):
             if white_piece_list[i].role == "pawn":
                 piece_move_list = white_pawn_move(white_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if white_piece_list[i].role == "knight":
                 piece_move_list = knight_move(white_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if white_piece_list[i].role == "bishop":
                 piece_move_list = bishop_move(white_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if white_piece_list[i].role == "rook":
                 piece_move_list = rook_move(white_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if white_piece_list[i].role == "queen":
                 piece_move_list = queen_move(white_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if white_piece_list[i].role == "king":
                 possible_moves.append(king_move(white_piece_list[i]))
@@ -1772,23 +1747,23 @@ def check_move(attack_list, color):
         for i in range(len(black_piece_list)):
             if black_piece_list[i].role == "pawn":
                 piece_move_list = black_pawn_move(black_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if black_piece_list[i].role == "knight":
                 piece_move_list = knight_move(black_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if black_piece_list[i].role == "bishop":
                 piece_move_list = bishop_move(black_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if black_piece_list[i].role == "rook":
                 piece_move_list = rook_move(black_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if black_piece_list[i].role == "queen":
                 piece_move_list = queen_move(black_piece_list[i])
-                sorted_list = [i for i in piece_move_list if i in attack_list]
+                sorted_list = [x for x in piece_move_list if x in attack_list]
                 possible_moves.append(sorted_list)
             if black_piece_list[i].role == "king":
                 possible_moves.append(king_move(black_piece_list[i]))
