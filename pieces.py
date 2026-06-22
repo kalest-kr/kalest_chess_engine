@@ -294,13 +294,14 @@ def white_pawn_move(piece):
     for i in range(-1, 2, 2):
         temp_col = col +  i
         if not in_board(temp_row, temp_col):
-            continue
+            return possible_moves, piece.check
         square = rc_to_square(temp_row, temp_col)
         if color_check(square, piece):
             if square == black_king.pos:
                 piece.check = True
-                continue
+                return possible_moves, piece.check
             possible_moves.append(square)
+            return possible_moves, piece.check
         else:
             for i in range(len(white_piece_list)):
                 if white_piece_list[i].pos == square:
@@ -310,7 +311,7 @@ def white_pawn_move(piece):
         for i in range(-1, 2, 2):
             temp_col = col + i
             if not in_board(temp_row, temp_col):
-                continue
+                return possible_moves, piece.check
             square = rc_to_square(temp_row, temp_col)
             for i in range(len(black_pawn_list)):
                 if square == black_pawn_list[i].pos:
@@ -327,7 +328,7 @@ def white_pawn_attack(piece):
     for i in range(-1, 2, 2):
         temp_col = col +  i
         if not in_board(temp_row, temp_col):
-            continue
+            return never_the_less, possible_moves, piece.check
         square = rc_to_square(temp_row, temp_col)
         if color_check(square, piece):
             if color_check(square, piece):
@@ -364,7 +365,7 @@ def black_pawn_move(piece):
     for i in range(-1, 2, 2):
         temp_col = col - i
         if not in_board(temp_row, temp_col):
-            continue
+            return possible_moves, piece.check
         square = rc_to_square(temp_row, temp_col)
         if color_check(square, piece):
             if color_check(square, piece):
@@ -382,7 +383,7 @@ def black_pawn_move(piece):
         for i in range(-1, 2, 2):
             temp_col = col - i
             if not in_board(temp_row, temp_col):
-                continue
+                return possible_moves, piece.check
             square = rc_to_square(temp_row, temp_col)
             for i in range(len(white_pawn_list)):
                 if square == white_pawn_list[i].pos:
@@ -399,7 +400,8 @@ def black_pawn_attack(piece):
     for i in range(-1, 2, 2):
         temp_col = col +  i
         if not in_board(temp_row, temp_col):
-            continue
+            return never_the_less, possible_moves, piece.check
+
         square = rc_to_square(temp_row, temp_col)
         if color_check(square, piece):
             if color_check(square, piece):
@@ -407,6 +409,7 @@ def black_pawn_attack(piece):
                     piece.check = True
                     return never_the_less, possible_moves, piece.check
             possible_moves.append(square)
+            return never_the_less, possible_moves, piece.check
         else:
             never_the_less.append(square)
             for i in range(len(white_piece_list)):
